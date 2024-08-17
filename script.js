@@ -307,5 +307,6 @@ deleteBtn.addEventListener("click", function () {
 
     deleteUser.value = "";
     deletePassword.value = "";
+    incrementNum(element, 100000);
   }
 });

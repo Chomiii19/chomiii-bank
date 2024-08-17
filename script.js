@@ -13,9 +13,18 @@ const username = document.querySelector(".dataInputUser");
 const password = document.querySelector(".dataInputPassword");
 
 const bankSection = document.querySelector(".bankSection");
+const currentDate = document.querySelector(".spanDate");
 const balanceTotal = document.querySelector(".balanceValue");
 const transaction = document.querySelector(".transactions");
 const movementType = document.querySelector(".movement-type");
+const transferTo = document.querySelector(".transferUser");
+const transferAmount = document.querySelector(".transferBalance");
+const transferBtn = document.querySelector(".transferBtn");
+const requestAmount = document.querySelector(".requestAmount");
+const requestBtn = document.querySelector(".requestBtn");
+const deleteUser = document.querySelector(".deleteUsername");
+const deletePassword = document.querySelector(".deletePassword");
+const deleteBtn = document.querySelector(".deleteBtn");
 
 const popUp = document.querySelector(".popUp");
 const introSection = document.querySelector(".introduction");
@@ -133,25 +142,29 @@ getStartedBtn.addEventListener("click", (event) => {
 });
 
 //number increment
-const interval = 10000;
-const incrementNum = function (elem) {
+const incrementNum = function (elem, totalDuration) {
   const elements = elem.length ? elem : [elem];
   elements.forEach((el) => {
-    let startValue = 0;
-    const endValue = parseInt(el.getAttribute("data-val"));
-    const duration = Math.floor(interval / endValue);
+    const endValue = parseInt(el.getAttribute("data-val"), 10);
+    const startTime = Date.now();
 
     const counter = setInterval(function () {
-      startValue += 1;
+      const elapsedTime = Date.now() - startTime;
+      const progress = Math.min(elapsedTime / totalDuration, 1);
+      const currentValue = Math.floor(progress * endValue);
+
       el.textContent = `PHP ${new Intl.NumberFormat("en-US").format(
-        startValue
+        currentValue
       )}`;
-      if (startValue === endValue) clearInterval(counter);
-    }, duration);
+
+      if (progress === 1) {
+        clearInterval(counter);
+      }
+    }, 10);
   });
 };
 
-incrementNum(element);
+incrementNum(element, 100000);
 
 //LOGIN SIGNUP
 let currentAccount;
@@ -163,10 +176,41 @@ confirmBtn.addEventListener("click", function () {
 
       closePopUp();
       display(currentAccount);
-      incrementNum(balanceTotal);
+      currentAccount.balance = currentAccount.movements.reduce(
+        (acc, mov) => (acc += mov)
+      );
+      updateBalance(currentAccount);
+      balanceTotal.setAttribute("data-val", currentAccount.balance);
+      incrementNum(balanceTotal, 3000);
     }
   });
 });
+
+// Create current date and time
+const now = new Date();
+const options = {
+  hour: "numeric",
+  minute: "numeric",
+  day: "numeric",
+  month: "numeric",
+  year: "numeric",
+  // weekday: 'long',
+};
+
+const formatDate = function (date, locale) {
+  const calcDaysPassed = (date1, date2) =>
+    Math.round(Math.abs(date2 - date1) / (1000 * 60 * 60 * 24));
+
+  const dayPassed = calcDaysPassed(new Date(), date);
+
+  if (dayPassed === 0) return "Today";
+  if (dayPassed === 1) return "Yesterday";
+  if (dayPassed <= 7) return `${dayPassed} days ago`;
+
+  return new Intl.DateTimeFormat(locale).format(date);
+};
+
+currentDate.textContent = new Intl.DateTimeFormat("en-US", options).format(now);
 
 //display UI when logged in
 function display(acc) {
@@ -176,6 +220,15 @@ function display(acc) {
   welcome.textContent = fn[0];
   welcomeContainer.style.display = "inline";
   displayTransactions(acc);
+}
+
+function updateBalance(acc) {
+  acc.balance = acc.movements.reduce((acc, mov) => (acc += mov));
+  balanceTotal.textContent = `PHP ${new Intl.NumberFormat("en-US").format(
+    acc.balance
+  )}`;
+  balanceTotal.setAttribute("data-val", acc.balance);
+  displayTransactions(currentAccount);
 }
 
 //username generate
@@ -189,13 +242,70 @@ const displayTransactions = function (account) {
   transaction.innerHTML = "";
   account.movements.forEach((acc, i) => {
     const type = acc > 0 ? "deposit" : "withdraw";
+    const date = new Date(account.movementsDates[i]);
+    const displayDate = formatDate(date, "en-US");
 
     const html = `
   <div class="movements">
     <div class="movement-type ${type}">${i + 1} ${type.toUpperCase()}</div>
-    <div class="movement-date ">2 days ago</div>
-    <div class="movement-value">PHP ${acc}</div>
+    <div class="movement-date ">${displayDate}</div>
+    <div class="movement-value">PHP ${new Intl.NumberFormat("en-US").format(
+      acc
+    )}</div>
   </div>`;
     transaction.insertAdjacentHTML("afterbegin", html);
   });
 };
+
+//transfer
+transferBtn.addEventListener("click", function () {
+  const amount = Number(transferAmount.value);
+  const receiverAcc = accounts.find((acc) => acc.username === transferTo.value);
+  if (
+    receiverAcc &&
+    receiverAcc.username !== currentAccount.username &&
+    currentAccount.balance >= amount
+  ) {
+    currentAccount.movements.push(-amount);
+    currentAccount.movementsDates.push(now.toISOString());
+    receiverAcc.movements.push(amount);
+    receiverAcc.movementsDates.push(now.toISOString());
+    updateBalance(currentAccount);
+
+    transferAmount.value = transferTo.value = "";
+  }
+});
+
+//request
+requestBtn.addEventListener("click", function () {
+  const amount = Number(requestAmount.value);
+  if (amount <= currentAccount.balance * 0.5) {
+    currentAccount.movements.push(amount);
+    currentAccount.movementsDates.push(now.toISOString());
+    updateBalance(currentAccount);
+    requestAmount.value = "";
+  }
+});
+
+//close
+deleteBtn.addEventListener("click", function () {
+  if (
+    deleteUser.value === currentAccount.username &&
+    +deletePassword.value === currentAccount.pin
+  ) {
+    const index = accounts.findIndex(
+      (acc) => currentAccount.username === acc.username
+    );
+    accounts.splice(index, 1);
+    currentAccount = null;
+
+    bankSection.style.display = "none";
+    signUpBtn.style.display = "inline";
+    logInBtn.style.display = "inline";
+    welcomeContainer.style.display = "none";
+    transaction.innerHTML = "";
+
+    deleteUser.value = "";
+    deletePassword.value = "";
+  }
+});

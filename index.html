@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="styles.css" />
-    <link rel="icon" type="image/png" sizes="32x32" href="images/logo.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="images/logo.png" />
     <script defer src="script.js"></script>
     <title>Chomi's Bank</title>
   </head>
@@ -23,23 +23,36 @@
         <div class="navigationButtons">
           <a class="logIn" href="#">Login</a>
           <a class="signUp" href="#">Sign Up</a>
+          <p class="welcomeUser">Welcome back, user</p>
         </div>
       </header>
-      <section class="introduction">
+      <div class="popUp">
+        <h1 class="popUpTitle">Log In Form</h1>
+        <div class="data">
+          <p class="popUp-text">Email</p>
+          <input type="text" placeholder="Enter username (jb)" class="dataInputUser" />
+        </div>
+        <div class="data">
+          <p class="popUp-text">Password</p>
+          <input type="password" placeholder="Enter password (1111)" class="dataInputPassword"/>
+        </div>
+        <button class="confirm">logIn</button>
+      </div>
+      <section class="introduction active">
         <div class="text">
-          <h1 class="name anim">Chomi's Bank</h1>
+          <h1 class="name anim">Chomi's <span class="bankName">Bank</span></h1>
           <p class="description anim">
             Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cum, quod
             alias? Eos maiores eveniet quaerat ut ad cum fugit reiciendis animi
             saepe laboriosam, porro consequatur reprehenderit dolores magni,
             praesentium ipsam?
           </p>
-          <a href="#" class="getStarted anim">Get Started</a>
+          <a class="getStarted anim" href="#">Get Started</a>
         </div>
 
         <div class="column">
           <div class="img1 anim">
-            <img class="column-img1" src="images/spotify.png" alt="" />
+            <img class="column-img1" src="images/Spotify.png" alt="" />
           </div>
           <div class="rows-container">
             <div class="row1">
@@ -77,7 +90,66 @@
           </div>
         </div>
       </section>
-      <section class="about"></section>
+      <section class="bankSection">
+        <div class="accountBalance">
+          <div class="balanceText">
+            <p class="currentBalance">Current Balance</p>
+            <p class="currentDate">
+              As of <span class="spanDate">05/03/2027</span>
+            </p>
+          </div>
+          <p class="balanceValue" data-val="4512">000</p>
+        </div>
+        <div class="features">
+          <div class="transferMoney">
+            <p class="nameTransfer">Transfer Money</p>
+            <div class="transferContainer featureContainer">
+              <div class="transferTo pContainer">
+                <input type="text">
+                <p>Transfer to</p>
+              </div>
+              <div class="transferAmount pContainer">
+                <input type="number">
+                <p>Amount</p>
+              </div>
+              <button class="transferBtn featureBtn">&#8594</button>
+            </div>
+          </div>
+          <div class="requestLoan ">
+            <p class="nameRequest">Request Loan</p>
+            <div class="requestContainer">
+            <div class="requestInput pContainer">
+              <input type="number">
+              <p>Amount</p>
+            </div>
+            <button class="requestBtn featureBtn">&#8594</button>
+            </div>
+          </div>
+          <div class="deleteAcc">
+            <p class="nameDelete">Close Account</p>
+            <div class="deleteContainer featureContainer">
+              <div class="deleteUser pContainer">
+                <input type="text">
+                <p>Username</p>
+              </div>
+              <div class="deletePass pContainer">
+                <input type="password">
+                <p>Password</p>
+              </div>
+              <button class="deleteBtn featureBtn">&#8594</button>
+            </div>
+          </div>
+        </div>
+        <div class="transactions">
+          <div class="movements">
+            <div class="movement-type deposit">1 Deposit</div>
+            <div class="movement-date ">2 days ago</div>
+            <div class="movement-value">PHP 4512</div>
+          </div>
+          <div class="summary">
+          </div>
+        </div>
+      </section>
     </div>
   </body>
 </html>

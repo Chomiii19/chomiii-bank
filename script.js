@@ -191,6 +191,7 @@ const now = new Date();
 const options = {
   hour: "numeric",
   minute: "numeric",
+  second: "numeric",
   day: "numeric",
   month: "numeric",
   year: "numeric",
@@ -210,7 +211,12 @@ const formatDate = function (date, locale) {
   return new Intl.DateTimeFormat(locale).format(date);
 };
 
-currentDate.textContent = new Intl.DateTimeFormat("en-US", options).format(now);
+setInterval(() => {
+  const current = new Date();
+  currentDate.textContent = new Intl.DateTimeFormat("en-US", options).format(
+    current
+  );
+}, 1000);
 
 //display UI when logged in
 function display(acc) {
@@ -307,6 +313,7 @@ deleteBtn.addEventListener("click", function () {
 
     deleteUser.value = "";
     deletePassword.value = "";
+
     incrementNum(element, 100000);
   }
 });

@@ -3,16 +3,19 @@
 //ELEMENTS
 const signUpBtn = document.querySelector(".signUp");
 const logInBtn = document.querySelector(".logIn");
-const welcome = document.querySelector(".welcomeUser");
+const welcome = document.querySelector(".welcomeUsername");
+const welcomeContainer = document.querySelector(".welcomeUser");
 const confirmBtn = document.querySelector(".confirm");
 const popUpTitle = document.querySelector(".popUpTitle");
 const element = document.querySelectorAll(".num");
 const getStartedBtn = document.querySelector(".getStarted");
 const username = document.querySelector(".dataInputUser");
 const password = document.querySelector(".dataInputPassword");
-const bankSection = document.querySelector(".bankSection");
 
+const bankSection = document.querySelector(".bankSection");
 const balanceTotal = document.querySelector(".balanceValue");
+const transaction = document.querySelector(".transactions");
+const movementType = document.querySelector(".movement-type");
 
 const popUp = document.querySelector(".popUp");
 const introSection = document.querySelector(".introduction");
@@ -101,6 +104,7 @@ const popUpFunction = function (str) {
 const closePopUp = function () {
   introSection.classList.remove("blurred");
   popUp.classList.remove("popUpActive");
+  username.value = password.value = "";
 };
 
 document.addEventListener(
@@ -116,11 +120,16 @@ introSection.addEventListener(
   () => introSection.classList.contains("blurred") && closePopUp()
 );
 
+//Button functionalities
 signUpBtn.addEventListener("click", () => popUpFunction("Sign Up"));
 logInBtn.addEventListener("click", () => popUpFunction("Log In"));
 getStartedBtn.addEventListener("click", (event) => {
-  event.stopPropagation();
-  popUpFunction("Sign Up");
+  if (currentAccount) {
+    bankSection.scrollIntoView({ behavior: "smooth" });
+  } else {
+    event.stopPropagation();
+    popUpFunction("Sign Up");
+  }
 });
 
 //number increment
@@ -144,28 +153,49 @@ const incrementNum = function (elem) {
 
 incrementNum(element);
 
-//LOGIN / SIGNUP
+//LOGIN SIGNUP
 let currentAccount;
 confirmBtn.addEventListener("click", function () {
   accounts.forEach((acc) => {
     if (username.value === acc.username && Number(password.value) === acc.pin) {
       currentAccount = acc;
       bankSection.style.display = "flex";
-      username.value = password.value = "";
+
       closePopUp();
-      signUpBtn.style.display = "none";
-      logInBtn.style.display = "none";
-      const fn = currentAccount.owner.split(" ");
-      welcome.textContent = `Welcome back, ${fn[0]}`;
-      welcome.style.display = "inline";
+      display(currentAccount);
       incrementNum(balanceTotal);
     }
   });
 });
 
+//display UI when logged in
+function display(acc) {
+  signUpBtn.style.display = "none";
+  logInBtn.style.display = "none";
+  const fn = acc.owner.split(" ");
+  welcome.textContent = fn[0];
+  welcomeContainer.style.display = "inline";
+  displayTransactions(acc);
+}
+
 //username generate
 accounts.forEach((acc) => {
   const [fn, ln] = acc.owner.toLowerCase().split(" ");
   acc.username = [fn[0] + ln[0]].join("");
-  console.log(accounts);
 });
+
+//transactions
+const displayTransactions = function (account) {
+  transaction.innerHTML = "";
+  account.movements.forEach((acc, i) => {
+    const type = acc > 0 ? "deposit" : "withdraw";
+
+    const html = `
+  <div class="movements">
+    <div class="movement-type ${type}">${i + 1} ${type.toUpperCase()}</div>
+    <div class="movement-date ">2 days ago</div>
+    <div class="movement-value">PHP ${acc}</div>
+  </div>`;
+    transaction.insertAdjacentHTML("afterbegin", html);
+  });
+};
